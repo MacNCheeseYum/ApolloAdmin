@@ -377,18 +377,35 @@ local function processCommand(message)
     return nil
 end
 
--- CHAT HANDLER (UNCHANGED)
+-- FIXED CHAT HANDLER
 player.Chatted:Connect(function(message)
     if message:sub(1,1) == "." then
         local response = processCommand(message)
-        if response then
-            local Chat = require(game:GetService("Chat"))
-            if player.Character and player.Character:FindFirstChild("Head") then
-                Chat:Chat(player.Character.Head, response, "White")
+        if response and player.Character then
+            local head = player.Character:FindFirstChild("Head")
+            if head then
+                -- Create chat bubble without require()
+                local bubble = Instance.new("BillboardGui")
+                local text = Instance.new("TextLabel")
+                
+                bubble.Adornee = head
+                bubble.Name = "ChatFeedback"
+                bubble.Size = UDim2.new(0, 100, 0, 40)
+                bubble.StudsOffset = Vector3.new(0, 3, 0)
+                bubble.Parent = head
+                
+                text.Size = UDim2.new(1, 0, 1, 0)
+                text.BackgroundTransparency = 1
+                text.Text = response
+                text.TextColor3 = Color3.new(1, 1, 1)
+                text.TextScaled = true
+                text.Parent = bubble
+                
+                game:GetService("Debris"):AddItem(bubble, 3) -- Auto-remove after 3 seconds
             end
         end
     end
 end)
 
--- Initialize GUI
+-- Initialize GUI (unchanged)
 cmdGui.Parent = player:WaitForChild("PlayerGui")
