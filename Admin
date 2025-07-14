@@ -1,0 +1,6 @@
+-- Sup im making an admin script
+
+if game.Players:Chat(".cmds") then 
+print("Hello World!")
+a = "Executed"
+print(a)
