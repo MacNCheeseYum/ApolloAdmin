@@ -1,6 +1,394 @@
 -- Sup im making an admin script
 
-if game.Players:Chat(".cmds") then 
-print("Hello World!")
-a = "Executed"
-print(a)
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local UIS = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+
+-- SYSTEMS VARIABLES
+local flying = false
+local flySpeed = 50
+local bodyVelocity
+local flyConnection
+local noclip = false
+local noclipConnection
+local touchControls = {
+    up = false,
+    down = false,
+    left = false,
+    right = false
+}
+
+-- Create the main GUI
+local cmdGui = Instance.new("ScreenGui")
+cmdGui.Name = "CommandsGui"
+cmdGui.ResetOnSpawn = false
+cmdGui.Enabled = false
+
+-- Main frame (properly centered)
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 300, 0, 400)
+mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0) -- Fixed centering
+mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+mainFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+mainFrame.BorderSizePixel = 0
+mainFrame.ClipsDescendants = true
+mainFrame.Active = true
+
+-- Title bar
+local titleBar = Instance.new("Frame")
+titleBar.Name = "TitleBar"
+titleBar.Size = UDim2.new(1, 0, 0, 30)
+titleBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+titleBar.BorderSizePixel = 0
+titleBar.Active = true
+
+local titleText = Instance.new("TextLabel")
+titleText.Name = "TitleText"
+titleText.Size = UDim2.new(1, -10, 1, 0)
+titleText.Position = UDim2.new(0, 10, 0, 0)
+titleText.BackgroundTransparency = 1
+titleText.Text = "Commands List"
+titleText.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleText.TextXAlignment = Enum.TextXAlignment.Left
+titleText.Font = Enum.Font.GothamBold
+titleText.TextSize = 14
+
+-- Close button
+local closeButton = Instance.new("TextButton")
+closeButton.Name = "CloseButton"
+closeButton.Size = UDim2.new(0, 30, 1, 0)
+closeButton.Position = UDim2.new(1, -30, 0, 0)
+closeButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+closeButton.BorderSizePixel = 0
+closeButton.Text = "X"
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.Font = Enum.Font.GothamBold
+closeButton.TextSize = 14
+
+-- Scrolling frame for commands
+local scrollFrame = Instance.new("ScrollingFrame")
+scrollFrame.Name = "ScrollFrame"
+scrollFrame.Size = UDim2.new(1, -10, 1, -40)
+scrollFrame.Position = UDim2.new(0, 5, 0, 35)
+scrollFrame.BackgroundTransparency = 1
+scrollFrame.BorderSizePixel = 0
+scrollFrame.ScrollBarThickness = 5
+scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+
+-- Mobile fly controls BY GPT
+local mobileControls = Instance.new("Frame")
+mobileControls.Name = "MobileControls"
+mobileControls.Size = UDim2.new(0, 200, 0, 200)
+mobileControls.Position = UDim2.new(1, -220, 1, -220)
+mobileControls.BackgroundTransparency = 1
+mobileControls.Visible = false
+
+-- Mobile control buttons (updated layout)
+local function createMobileButton(name, position, text)
+    local button = Instance.new("TextButton")
+    button.Name = name
+    button.Size = UDim2.new(0, 60, 0, 60)
+    button.Position = position
+    button.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+    button.BackgroundTransparency = 0.5
+    button.Text = text
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.Font = Enum.Font.GothamBold
+    button.TextSize = 20
+    button.BorderSizePixel = 0
+    button.Parent = mobileControls
+    return button
+end
+
+-- Updated button layout for up/down control MADE BY GPT
+local upBtn = createMobileButton("Up", UDim2.new(0.5, -30, 0, 10), "↑")
+local downBtn = createMobileButton("Down", UDim2.new(0.5, -30, 0.7, 10), "↓")
+local leftBtn = createMobileButton("Left", UDim2.new(0.15, -30, 0.35, 10), "←")
+local rightBtn = createMobileButton("Right", UDim2.new(0.85, -30, 0.35, 10), "→")
+
+-- Command list with descriptions (ONLY CHANGE: added .goto)
+local commands = {
+    {cmd = ".fly", desc = "Enables flying mode (toggle)"},
+    {cmd = ".reset", desc = "Resets your character"},
+    {cmd = ".walkspeed [number]", desc = "Sets walk speed (16 default)"},
+    {cmd = ".jumppower [number]", desc = "Sets jump power (50 default)"},
+    {cmd = ".noclip", desc = "Walk through objects (toggle)"},
+    {cmd = ".clip", desc = "Turns off noclip"},
+    {cmd = ".goto [name]", desc = "Teleport to player (partial name)"}, -- ADDED THIS LINE
+    {cmd = ".cmds", desc = "Shows/hides this commands list"},
+}
+
+-- COMMAND ENTRIES, MAKE BY GPT
+local function createCommandEntry(cmdData, index)
+    local entryFrame = Instance.new("Frame")
+    entryFrame.Name = "EntryFrame"
+    entryFrame.Size = UDim2.new(1, 0, 0, 50)
+    entryFrame.Position = UDim2.new(0, 0, 0, (index-1)*55)
+    entryFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    entryFrame.BorderSizePixel = 0
+    
+    local cmdText = Instance.new("TextLabel")
+    cmdText.Name = "CmdText"
+    cmdText.Size = UDim2.new(1, -10, 0, 20)
+    cmdText.Position = UDim2.new(0, 5, 0, 5)
+    cmdText.BackgroundTransparency = 1
+    cmdText.Text = cmdData.cmd
+    cmdText.TextColor3 = Color3.fromRGB(100, 200, 255)
+    cmdText.TextXAlignment = Enum.TextXAlignment.Left
+    cmdText.Font = Enum.Font.GothamBold
+    cmdText.TextSize = 14
+    
+    local descText = Instance.new("TextLabel")
+    descText.Name = "DescText"
+    descText.Size = UDim2.new(1, -10, 0, 20)
+    descText.Position = UDim2.new(0, 5, 0, 25)
+    descText.BackgroundTransparency = 1
+    descText.Text = cmdData.desc
+    descText.TextColor3 = Color3.fromRGB(200, 200, 200)
+    descText.TextXAlignment = Enum.TextXAlignment.Left
+    descText.Font = Enum.Font.Gotham
+    descText.TextSize = 12
+    
+    descText.Parent = entryFrame
+    cmdText.Parent = entryFrame
+    entryFrame.Parent = scrollFrame
+end
+
+-- Build the command list
+for i, cmd in ipairs(commands) do
+    createCommandEntry(cmd, i)
+end
+scrollFrame.CanvasSize = UDim2.new(0, 0, 0, #commands * 55)
+
+-- PARENT
+titleText.Parent = titleBar
+closeButton.Parent = titleBar
+titleBar.Parent = mainFrame
+scrollFrame.Parent = mainFrame
+mainFrame.Parent = cmdGui
+mobileControls.Parent = cmdGui
+
+-- DRAGGABLE GUI, BROKEN.
+local dragging = false
+local dragInput
+local dragStart
+local startPos
+
+local function updateInput(input)
+    local delta = input.Position - dragStart
+    mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+mainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = mainFrame.Position
+        
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+mainFrame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        updateInput(input)
+    end
+end)
+
+-- Close button functionality
+closeButton.MouseButton1Click:Connect(function()
+    cmdGui.Enabled = false
+end)
+
+-- MOBILE FLY CONTROLS
+upBtn.MouseButton1Down:Connect(function() touchControls.up = true end)
+upBtn.MouseButton1Up:Connect(function() touchControls.up = false end)
+downBtn.MouseButton1Down:Connect(function() touchControls.down = true end)
+downBtn.MouseButton1Up:Connect(function() touchControls.down = false end)
+leftBtn.MouseButton1Down:Connect(function() touchControls.left = true end)
+leftBtn.MouseButton1Up:Connect(function() touchControls.left = false end)
+rightBtn.MouseButton1Down:Connect(function() touchControls.right = true end)
+rightBtn.MouseButton1Up:Connect(function() touchControls.right = false end)
+
+-- BROKEN FLY.
+local function toggleFly()
+    flying = not flying
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:WaitForChild("Humanoid")
+    
+    if flying then
+        humanoid.PlatformStand = true
+        bodyVelocity = Instance.new("BodyVelocity")
+        bodyVelocity.Velocity = Vector3.new(0, 0.1, 0)
+        bodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+        bodyVelocity.Parent = character:FindFirstChild("HumanoidRootPart")
+        
+        mobileControls.Visible = UIS.TouchEnabled
+        
+        if flyConnection then flyConnection:Disconnect() end
+        flyConnection = RunService.Heartbeat:Connect(function()
+            if not flying or not character:FindFirstChild("HumanoidRootPart") then
+                flyConnection:Disconnect()
+                return
+            end
+            
+            local rootPart = character.HumanoidRootPart
+            local cam = workspace.CurrentCamera
+            local direction = Vector3.new()
+            
+            if UIS:IsKeyDown(Enum.KeyCode.W) or touchControls.up then
+                direction = direction + (cam.CFrame.LookVector * flySpeed)
+            end
+            if UIS:IsKeyDown(Enum.KeyCode.S) or touchControls.down then
+                direction = direction - (cam.CFrame.LookVector * flySpeed)
+            end
+            if UIS:IsKeyDown(Enum.KeyCode.A) or touchControls.left then
+                direction = direction - (cam.CFrame.RightVector * flySpeed)
+            end
+            if UIS:IsKeyDown(Enum.KeyCode.D) or touchControls.right then
+                direction = direction + (cam.CFrame.RightVector * flySpeed)
+            end
+            
+            rootPart.Velocity = direction
+            bodyVelocity.Velocity = Vector3.new(0, 0.1, 0)
+        end)
+    else
+        humanoid.PlatformStand = false
+        if bodyVelocity then bodyVelocity:Destroy() end
+        if flyConnection then flyConnection:Disconnect() end
+        mobileControls.Visible = false
+    end
+end
+
+-- NOCLIP SYSTEM 
+local function toggleNoclip(value)
+    noclip = value
+    local character = player.Character
+    if not character then return end
+    
+    if noclipConnection then noclipConnection:Disconnect() end
+    
+    if noclip then
+        noclipConnection = RunService.Stepped:Connect(function()
+            if character then
+                for _, part in pairs(character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = false
+                    end
+                end
+            else
+                noclipConnection:Disconnect()
+            end
+        end)
+    else
+        if character then
+            for _, part in pairs(character:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = true
+                end
+            end
+        end
+    end
+end
+
+-- NEW TELEPORT FUNCTION 
+local function teleportToPlayer(namePart)
+    namePart = namePart:lower()
+    for _, target in ipairs(Players:GetPlayers()) do
+        if target ~= player and 
+           (target.DisplayName:lower():find(namePart) or 
+            target.Name:lower():find(namePart)) then
+            local targetRoot = target.Character and target.Character:FindFirstChild("HumanoidRootPart")
+            local localRoot = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+            if targetRoot and localRoot then
+                localRoot.CFrame = targetRoot.CFrame
+                return "Teleported to "..target.DisplayName
+            end
+        end
+    end
+    return "Player not found"
+end
+
+-- OTHER COMMANDS 
+local function resetCharacter()
+    local character = player.Character
+    if character then
+        local humanoid = character:FindFirstChild("Humanoid")
+        if humanoid then
+            humanoid.Health = 0
+        end
+    end
+end
+
+local function setWalkSpeed(speed)
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:WaitForChild("Humanoid")
+    humanoid.WalkSpeed = tonumber(speed) or 16
+end
+
+local function setJumpPower(power)
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:WaitForChild("Humanoid")
+    humanoid.JumpPower = tonumber(power) or 50
+end
+
+-- ADDED GOTO
+local function processCommand(message)
+    local args = {}
+    for word in message:gmatch("%S+") do table.insert(args, word:lower()) end
+    
+    if args[1] == ".fly" then
+        toggleFly()
+        return "Fly "..(flying and "enabled" or "disabled")
+    elseif args[1] == ".reset" then
+        resetCharacter()
+        return "Resetting character..."
+    elseif args[1] == ".walkspeed" and args[2] then
+        setWalkSpeed(args[2])
+        return "Walk speed set to "..args[2]
+    elseif args[1] == ".jumppower" and args[2] then
+        setJumpPower(args[2])
+        return "Jump power set to "..args[2]
+    elseif args[1] == ".noclip" then
+        toggleNoclip(true)
+        return "Noclip enabled"
+    elseif args[1] == ".clip" then
+        toggleNoclip(false)
+        return "Noclip disabled"
+    elseif args[1] == ".goto" and args[2] then -- NEW CONDITION
+        return teleportToPlayer(table.concat(args, " ", 2))
+    elseif args[1] == ".cmds" then
+        cmdGui.Enabled = not cmdGui.Enabled
+        return cmdGui.Enabled and "Commands shown" or "Commands hidden"
+    end
+    return nil
+end
+
+-- CHAT HANDLER (UNCHANGED)
+player.Chatted:Connect(function(message)
+    if message:sub(1,1) == "." then
+        local response = processCommand(message)
+        if response then
+            local Chat = require(game:GetService("Chat"))
+            if player.Character and player.Character:FindFirstChild("Head") then
+                Chat:Chat(player.Character.Head, response, "White")
+            end
+        end
+    end
+end)
+
+-- Initialize GUI
+cmdGui.Parent = player:WaitForChild("PlayerGui")
