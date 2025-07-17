@@ -1,0 +1,171 @@
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Unknownuser11736/suntaiteam/main/kavouilibrary/fixedsliders"))()
+local Window = Library.CreateLib("XyzWare", "Serpent")
+
+local XyzWaterMark = Instance.new("ScreenGui")
+local TextLabel = Instance.new("TextButton")
+
+XyzWaterMark.Name = "XyzWaterMark"
+XyzWaterMark.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+XyzWaterMark.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+XyzWaterMark.ResetOnSpawn = false
+
+TextLabel.Parent = XyzWaterMark
+TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.BackgroundTransparency = 1.000
+TextLabel.BorderSizePixel = 0
+TextLabel.Position = UDim2.new(-0.000772226602, 0, 0.0343558267, 0)
+TextLabel.Size = UDim2.new(0.130134634, 0, 0.0600389072, 0)
+TextLabel.Font = Enum.Font.GothamBold
+TextLabel.Text = "XyzWare"
+TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.TextScaled = true
+TextLabel.TextSize = 7.000
+TextLabel.TextWrapped = true
+TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+TextLabel.MouseButton1Down:Connect(function()
+	Library:ToggleUI()
+end)
+
+local Tab = Window:NewTab("Local Player")
+local Tab1Section = Tab:NewSection("LocalPlayer")
+
+
+local Tab2 = Window:NewTab("Da hood")
+local Tab2Section = Tab2:NewSection("Games")
+
+local Tab3 = Window:NewTab("My own stuff")
+local Tab3Section = Tab3:NewSection("Server Sided")
+
+local Tab4 = Window:NewTab("Locks")
+local Tab4Section = Tab4:NewSection("Locks")
+
+local Tab5 = Window:NewTab("FE Scripts")
+local Tab5Section = Tab5:NewSection("FE Scripts")
+
+local Tab6 = Window:NewTab("Admins")
+local Tab6Section = Tab6:NewSection("Admins")
+
+local Tab7 = Window:NewTab("Guis")
+local Tab7Section = Tab7:NewSection("Guis")
+
+local Tab8 = Window:NewTab("Slap Battles")
+local Tab8Section = Tab8:NewSection("Slap Battles")
+
+--Buttons
+
+Tab1Section:NewTextBox("WalkSpeed", "Increase Walkspeed", function(s)
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = s
+end)
+
+Tab1Section:NewTextBox("JumpPower", "Increase JumpPower", function(s)
+    game.Players.LocalPlayer.Character.Humanoid.JumpPower = s
+end)
+
+
+Tab2Section:NewButton("SwagMode", "", function()
+loadstring(game:HttpGet('https://raw.githubusercontent.com/lerkermer/lua-projects/master/SwagModeV002'))()
+      		print("SwagMode Executed!")
+end)
+
+Tab2Section:NewButton("RayCodex", "", function()
+loadstring(game:GetObjects("rbxassetid://5812737894")[1].Source)()
+      		print("RayCodex Executed!")
+end)
+
+Tab2Section:NewButton("Faded (Outdated)", "", function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/NighterEpic/Faded-Grid/main/YesEpic", true))()
+      		print("Faded Executed!")
+end)
+
+Tab2Section:NewButton("Speed", "", function()
+getgenv().Speed = true
+getgenv().FakeMacro = false
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Allvideo/nukermode/main/Kit%20tools.txt"))()
+      		print("Speed Executed!")
+end)
+
+
+Tab2Section:NewButton("Bedwars Ape V1", "", function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/lightHubDev/Ape/main/ApeMain"))()
+end)
+
+Tab2Section:NewButton("Bedwars Vape V4", "", function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/7GrandDadPGN/VapeV4ForRoblox/main/NewMainScript.lua", true))()
+      		print("VapeV4 Executed!")
+end)
+
+Tab5Section:NewButton("Chat Bypass", "", function()
+loadstring(game:HttpGet('https://raw.githubusercontent.com/synnyyy/synergy/additional/betterbypasser',true))()
+      		print("Better bypass Executed!")
+end)
+
+Tab5Section:NewButton("Hitbox Expander", "", function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Vcsk/RobloxScripts/main/HitboxExpander.lua"))()
+      		print("Hitbox Expander Executed!")
+end)
+
+Tab6Section:NewButton("Inf Yield", "", function()
+loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+      		print("Inf Yield Executed!")
+end)
+
+Tab6Section:NewButton("Fates Admin", "", function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/fatesc/fates-admin/main/main.lua"))()
+      		print("Fates Admin Executed!")
+end)
+
+Tab6Section:NewButton("Comet Admin", "It's server sided", function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/FilteringEnabled/FE/main/Comet"))()
+      		print("Comet Admin Executed!")
+end)
+
+Tab6Section:NewButton("Impulse Admin", "", function()
+loadstring(game:HttpGet('http://impulse-hub.xyz/ImpulseHub',true))()
+      		print("Impulse Admin Executed!")
+end)
+
+Tab7Section:NewButton("Astral Hub", "", function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Vcsk/AstralHub/main/Main.lua", true))()
+      		print("Astral Hub Executed!")
+end)
+
+Tab7Section:NewButton("NukeVsCity Hub", "", function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/NukeVsCity/TheALLHACKLoader/main/NukeLoader", true))()
+      		print("NukevsCity Hub Executed!")
+end)
+
+Tab7Section:NewButton("V.G Hub", "", function()
+loadstring(game:HttpGet('https://raw.githubusercontent.com/1201for/V.G-Hub/main/V.Ghub'))()
+      		print("V.G Hub Executed!")
+end)
+
+Tab7Section:NewButton("GigaChad V4", "", function()
+loadstring(game:HttpGet('https://raw.githubusercontent.com/OWJBWKQLAISH/GigaChad-Hub/main/Gigachad%20Hub%20V4'))()
+      		print("GigaChad Hub V4 Executed!")
+end)
+
+Tab7Section:NewButton("Inferno V3", "", function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/OWJBWKQLAISH/Inferno-X/main/INFERNO%20X%20VANCE"))()
+      		print("Inferno V3 Executed!")
+end)
+
+Tab7Section:NewButton("Lightzone V2", "", function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/ImJosh66/Idjrf5/main/Protected_3590052699937668.lua.txt"))()
+      		print("LightZone V2 Executed!")
+end)
+
+Tab4Section:NewButton("SonoWare", "", function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/bobobexz/sono-op/main/README.md", true))()
+      		print("SonoWare Executed!")
+end)
+
+Tab4Section:NewButton("Nyula", "", function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/nyulachan/nyula/main/nyuladhm"))()
+      		print("Nyula Executed!")
+end)
+
+
+Tab8Section:NewButton("Whopper SB", "", function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/qwertyui-cool/uhh-yes/main/whopper.lua"))()
+      		print("Whopper SB Executed!")
+end)
